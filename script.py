@@ -1,3 +1,4 @@
+# noinspection PyPEP8Naming
 # -*- coding: utf-8 -*-
 """
 Created on Sun Feb 05 18:58:50 2017
@@ -7,8 +8,9 @@ Created on Sun Feb 05 18:58:50 2017
 import os
 import math
 import numpy as np
-os.chdir('C:/Users/SYARLAG1/Desktop/AI-ConnectFour+Go')
 
+#os.chdir('C:/Users/SYARLAG1/Desktop/AI-ConnectFour+Go')
+os.chdir('/Users/Sriram/Desktop/DePaul/Q5/CSC 480/AI-ConnectFour-Go')
 
 # 9 x 9 board
 # 2 points for pair next to each other
@@ -20,7 +22,7 @@ class board(object):
         self.shape = shape
         charArr = np.chararray(shape)
         charArr[:] = '.'
-        self.boardArr = charArr # returns the array of the board        
+        self.boardArr = charArr # returns the array of the board
         
     # prints the board with the positions filled    
     def printBoard(self):
@@ -34,9 +36,11 @@ class board(object):
     
     # updates board by adding '0' at appropriate pos in selected col    
     def playerMove(self, colNum):
-        
+
+        newBoardArr = self.boardArr
+
         colFull = False        
-        targetCol = self.boardArr[:,colNum]
+        targetCol = newBoardArr[:,colNum]
 
         try:
             highestDot = list(targetCol).index('.') # location of highest empty space   
@@ -49,15 +53,17 @@ class board(object):
             print 'Selected Column is full'
             return False
                
-        self.boardArr[highestDot-1, colNum] = '0'
+        newBoardArr[highestDot-1, colNum] = '0'
         
-        return self.boardArr
+        return board(newBoardArr)
         
     # updates board by adding 'X' at appropriate pos in selected col   
     def AIMove(self, colNum):
+
+        newBoardArr = self.boardArr
                 
         colFull = False        
-        targetCol = self.boardArr[:,colNum]
+        targetCol = newBoardArr[:,colNum]
 
         try:
             highestDot = list(targetCol).index('.') # location of highest empty space   
@@ -70,20 +76,29 @@ class board(object):
             print 'Selected Column is full'
             return False
                
-        self.boardArr = self.boardArr[highestDot-1, colNum] = 'X'
+        newBoardArr[highestDot-1, colNum] = 'X'
 
-        return self.boardArr
+        return newBoardArr
         
-    def score()
+    def score(self):
+
+        currBoard = self.boardArr
+
+
+
     
 ###############################################################################
 class node():
     
-    def __init__(self, board):
+    def __init__(self, initBoard):
         
-        self.boardArr = boardArr
+        self.initBoard = board(initBoard)
     
     def successors(self):
+
+        for col_pos in range(self.initBoard.shape[0]):
+
+            
         
         
         
