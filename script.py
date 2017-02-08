@@ -8,8 +8,8 @@ Created on Sun Feb 05 18:58:50 2017
 import os
 import numpy as np
 
-os.chdir('C:/Users/SYARLAG1/Desktop/AI-ConnectFour-Go')
-#os.chdir('/Users/Sriram/Desktop/DePaul/Q5/CSC 480/AI-ConnectFour-Go')
+#os.chdir('C:/Users/SYARLAG1/Desktop/AI-ConnectFour-Go')
+os.chdir('/Users/Sriram/Desktop/DePaul/Q5/CSC 480/AI-ConnectFour-Go')
 
 # 9 x 9 board
 # 2 points for pair next to each other
@@ -144,27 +144,27 @@ class board(object):
 ###############################################################################
 class node(object):
     
-    def __init__(self, boardArr):
+    def __init__(self, boardObj):
         
-        self.initBoard = board(boardArr)
+        self.boardObj = boardObj
 
+    
     # generate the successors    
 
     def genSuccessors(self, who):
                 
         if who == 'max':
             
-            for col_pos in range(self.initBoard.boardArr.shape[0]):
+            for col_pos in range(self.boardObj.boardArr.shape[0]):
                 
-                yield self.initBoard.playerMove(col_pos)
+                yield self.boardObj.playerMove(col_pos)
         
         if who == 'min':
 
-            for col_pos in range(self.initBoard.boardArr.shape[0]):
+            for col_pos in range(self.boardObj.boardArr.shape[0]):
                 
-                yield self.initBoard.AImove(col_pos)
+                yield self.boardObj.AImove(col_pos)
 
-    
 
 
 ###############################################################################
@@ -185,22 +185,69 @@ def minimax(boardShape = [9,9], maxDepth):
     
     goalReached = False
     
+    currBoard = initBoard # all dots
+
+    
     while not goalReached:
-        
-        currBoard = initBoard
-        
+                
         playerMoveCol = int(input('Please enter a column number to drop checkers in: ')) 
         
-        nextBoard = currBoard.playerMove(playerMoveCol)
-
-        while currDepth < maxDepthl:
+        nextBoard = currBoard.playerMove(playerMoveCol) # board with first player move
+        
+        # adding attributes to current node
+        currNode = node(nextBoard)
+        currNode.parent = False
+        currNode.type = 'max' # we start with player (max) as root node
+        currNode.depth = 0 # start with depth of 0
+        currNode.childGen = currNode.genSuccessors('max')
+        
+        # queue to hold nodes that have already been calculated for performance enhancement
+        visitedAndCalculated = [] 
+        #nodeGenStore = [currNode.genSuccessors('min')]
+        depthQ = [currNode] # queue to hold nodes
+        visited = [currNode] # previously visited nodes
+           
+        while currNode.depth < maxDepth:
             
-            # DFS loop
+            childNode = next(currNode.childGen)
+            childNode.depth = currNode.depth + 1
+            childNode.parent = currNode
+            childNode.type = 'min' if currNode.type == 'max' else 'max'
+            
+            nextType = 'min' if nextNode.type == 'max' else 'max'
+            
+            childNode.childGen = childNode.genSuccessors(nextType)
+            
+            currNode = childNode
+        
+        # currNodethis is the node at the last depth level
+        
+        # now that we reached the final depth, we start moving\
+        # back up and calculating cost
+        
+        while not currNode.parent:
+            
+            prevNode = currNode.parent            
+            prevNode.eval = currentNode.evaluate()[2] # only want diff
+
+            moreChildren = True
+
+            while moreChildren:            
+                try:
+                                        
+                    
+                except:
+                    moreChildren = False
+                
+                
             
             
-             
-
-
+            
+        
+            
+            
+                        
+            
         currBoard = nextBoard
 
         goalReached = currBoard.isGoal()        
@@ -220,13 +267,13 @@ def minimax(boardShape = [9,9], maxDepth):
         
     
     
-    
 # calc cost for each successor function
 # create successor function which lists out possible moves for opponent
 # add alpha beta pruning
 # goal test function -- tells if state is terminal
 
     
-
+def gen(i):
+    for x in range(i): yield 5
 
 
