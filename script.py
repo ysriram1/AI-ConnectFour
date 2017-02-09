@@ -298,7 +298,7 @@ def playGame(maxDepth, boardShape = [9,9], alphaBeta=False):
     print 'Your Score: ', playerScore
             
     if finalScore > 0:
-        print 'You win! Congrates!'
+        print 'You win! Congrats!'
         
     if finalScore < 0:
         print 'Computer Wins!'
