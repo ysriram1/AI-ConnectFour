@@ -184,26 +184,31 @@ def minMaxSearch(currentNode, depth, kind, maxDepth, alphaBeta=False, alpha = -m
             depth1Nodes = []
         
         childNodes = currentNode.successors('min')
-        currVal = -maxsize # initialize a lowest possible value
+        currVal = alpha # initialize a lowest possible value (only changes when alphaBeta is True)
         
         for childNode in childNodes:
             
             if alphaBeta:
                 
-                childVal = minMaxSearch(childNode, depth+1, 'min', maxDepth, True, alpha, beta) 
+                childVal = minMaxSearch(childNode, depth+1, 'min', maxDepth, True, currVal, beta) 
                 currVal = max(currVal, childVal)
-                alpha = max(currVal, alpha)
-           
-                if beta <= alpha: # this cannot be the shortest path, so dont consider
+                #alpha = max(currVal, alpha)
+                
+                if depth == 0: # if rootnode, then we need to return next move node
+                
+                    depth1Vals.append(childVal) 
+                    depth1Nodes.append(childNode)       
+                   
+                if beta <= currVal: # if true, this cannot be the shortest path, so dont consider
                     break 
             else: 
                 childVal = minMaxSearch(childNode, depth+1, 'min', maxDepth) 
                 currVal = max(currVal, childVal)
             
-            if depth == 0: # if rootnode, then we need to return next move node
+                if depth == 0: # if rootnode, then we need to return next move node
                 
-                depth1Vals.append(childVal) 
-                depth1Nodes.append(childNode)                  
+                    depth1Vals.append(childVal) 
+                    depth1Nodes.append(childNode)                  
                         
         if depth == 0: # return the node that corresponds to next move 
         
@@ -215,17 +220,22 @@ def minMaxSearch(currentNode, depth, kind, maxDepth, alphaBeta=False, alpha = -m
     if kind == 'min':
         
         childNodes = currentNode.successors('max')
-        currVal = maxsize # initialize a largest possible value
+        currVal = beta # initialize a largest possible value
             
         for childNode in childNodes:
             
             if alphaBeta:
                 
-                childVal = minMaxSearch(childNode, depth+1, 'max', maxDepth, True, alpha, beta) 
+                childVal = minMaxSearch(childNode, depth+1, 'max', maxDepth, True, alpha, currVal) 
                 currVal = min(currVal, childVal)
-                beta = min(beta, currVal)
+                #beta = min(beta, currVal)
+                
+                if depth == 0: # if rootnode, then we need to return next move node
+                
+                    depth1Vals.append(childVal) 
+                    depth1Nodes.append(childNode)    
             
-                if beta <= alpha:
+                if currVal <= alpha:
                     break
             
             else:
