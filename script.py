@@ -350,6 +350,6 @@ def playGame(boardShape = [9,9], alphaBeta=False):
         
         
 ###############################################################################
-playGame(boardShape = [5,5], alphaBeta=False)
+playGame(boardShape = [9,9], alphaBeta=False)
 
 
