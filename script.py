@@ -5,12 +5,8 @@ Created on Sun Feb 05 18:58:50 2017
 
 @author: Sriram Yarlagadda
 """
-import os
 import numpy as np
 from sys import maxsize
-
-os.chdir('C:/Users/SYARLAG1/Desktop/AI-ConnectFour-Go')
-#os.chdir('/Users/Sriram/Desktop/DePaul/Q5/CSC 480/AI-ConnectFour-Go')
 
 ## RULES:
 # 9 x 9 board (default)
