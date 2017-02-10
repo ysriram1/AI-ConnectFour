@@ -13,11 +13,11 @@ os.chdir('C:/Users/SYARLAG1/Desktop/AI-ConnectFour-Go')
 #os.chdir('/Users/Sriram/Desktop/DePaul/Q5/CSC 480/AI-ConnectFour-Go')
 
 ## RULES:
-# 9 x 9 board
+# 9 x 9 board (default)
 # 2 points for pair next to each other
 # 1 point for every piece diagnol to each other
 
-# Note: 'max' refers to player and 'min' refers to ai
+# Note: 'min' refers to player and 'max' refers to ai
 ###############################################################################
 class board(object):
     
@@ -27,6 +27,9 @@ class board(object):
         
     # prints the board with the positions filled    
     def printBoard(self):
+        '''
+        prints out the current board
+        '''
 
         printStr = 'Current Board: \n\n'
 
@@ -37,6 +40,12 @@ class board(object):
     
     # updates board by adding '0' at appropriate pos in selected col    
     def playerMove(self, colNum):
+        '''
+        drops a 0 in the current board at the first free row in the 
+        specified column (colNum)
+        
+        returns updated board as an object of board class
+        '''
 
         newBoardArr = np.copy(self.boardArr)
 
@@ -59,6 +68,12 @@ class board(object):
         
     # updates board by adding 'X' at appropriate pos in selected col   
     def aiMove(self, colNum):
+        '''
+        drops an X in the current board at the first free row in the 
+        specified column (colNum)
+        
+        returns updated board as an object of board class
+        '''
 
         newBoardArr = np.copy(self.boardArr)
                 
@@ -82,8 +97,14 @@ class board(object):
     # evaluates the total score = score(max) - score(min)
     # returns maxScore, minScore, and max-min
     def evaluate(self):
+        '''
+        drops a 0 in the current board at the first free row in the 
+        specified column (colNum)
         
-        maxScore = 0 # aka the player's score 
+        returns the score of the ai, player, ai - player
+        '''
+        
+        playerScore = 0 
         indices_0 = np.where(self.boardArr == 'O') # location of '0'. ([rows],[cols])
         indices_0_zip = zip(indices_0[0], indices_0[1]) # (row_i,col_i)        
         
@@ -92,21 +113,21 @@ class board(object):
 
                 if indices_0_zip[i][0] == indices_0_zip[j][0] and \
                 indices_0_zip[i][1] + 1 == indices_0_zip[j][1]: # same row, consecutive col
-                    maxScore += 2
+                    playerScore += 2
                 
                 if indices_0_zip[i][1] == indices_0_zip[j][1] and \
                 indices_0_zip[i][0] + 1 == indices_0_zip[j][0]: # same col, consecutive row
-                    maxScore += 2
+                    playerScore += 2
                 
                 if indices_0_zip[i][1] + 1 == indices_0_zip[j][1] and \
                 indices_0_zip[i][0] + 1 == indices_0_zip[j][0]: # diagnol \ dir
-                    maxScore += 1
+                    playerScore += 1
                 
                 if indices_0_zip[i][1] == indices_0_zip[j][1] + 1 and \
                 indices_0_zip[i][0] + 1 == indices_0_zip[j][0]: # diagnol / dir
-                    maxScore += 1
+                    playerScore += 1
 
-        minScore = 0 # aka the ai score
+        aiScore = 0 
         indices_X = np.where(self.boardArr == 'X') # location of '0'. ([rows],[cols])
         indices_X_zip = zip(indices_X[0], indices_X[1]) # (row_i,col_i)        
         
@@ -115,25 +136,29 @@ class board(object):
 
                 if indices_X_zip[i][0] == indices_X_zip[j][0] and \
                 indices_X_zip[i][1] + 1 == indices_X_zip[j][1]: # same row, consecutive col
-                    minScore += 2
+                    aiScore += 2
                 
                 if indices_X_zip[i][1] == indices_X_zip[j][1] and \
                 indices_X_zip[i][0] + 1 == indices_X_zip[j][0]: # same col, consecutive row
-                    minScore += 2
+                    aiScore += 2
                 
                 if indices_X_zip[i][1] + 1 == indices_X_zip[j][1] and \
                 indices_X_zip[i][0] + 1 == indices_X_zip[j][0]: # diagnol
-                    minScore += 1
+                    aiScore += 1
                     
                 if indices_X_zip[i][1] == indices_X_zip[j][1] + 1 and \
                 indices_X_zip[i][0] + 1 == indices_X_zip[j][0]: # diagnol / dir
-                    minScore += 1
+                    aiScore += 1
                     
         
-        return maxScore, minScore, maxScore - minScore
+        return aiScore, playerScore, aiScore - playerScore # playerScore - aiScore
 
     # returns a list of successors    
     def successors(self, kind):
+        '''
+        returns a list of successor boards for a current board based on all the 
+        possible places where the computer can move
+        '''
         
         childBoards = []
                 
@@ -141,7 +166,7 @@ class board(object):
             
             for col_pos in range(self.boardArr.shape[1]):
                 
-                newBoardObj = self.aiMove(col_pos)
+                newBoardObj = self.playerMove(col_pos)
                 
                 if not newBoardObj: continue # if col is full
                 
@@ -153,7 +178,7 @@ class board(object):
                 
                 newBoardObj = self.aiMove(col_pos)
 
-                if not newBoardObj: continue# if col is full              
+                if not newBoardObj: continue # if col is full              
                 
                 childBoards.append(newBoardObj)         
         
@@ -162,57 +187,59 @@ class board(object):
             
     # checks if board is full (hence is goal)
     def isGoal(self): # goal reached when all dots filled
-        
+        '''
+        returns True is board is full else returns False
+        '''
         return len(np.where(self.boardArr == '.')[0]) == 0
         
     
 ###############################################################################
 def minMaxSearch(currentNode, depth, kind, maxDepth, alphaBeta=False, alpha = -maxsize, beta=maxsize):
     '''
-    returns the best next board move based on minimax search
+    returns board with the best next move based on minimax search
     '''
     
     if depth == maxDepth: # terminal node
         
         return currentNode.evaluate()[2] 
         
-    if kind == 'max':
-        
-        if depth == 0: # if we are looking at root --> capture best board in next layer
-            
-            depth1Vals = []
-            depth1Nodes = []
+    if kind == 'max':            
         
         childNodes = currentNode.successors('min')
         currVal = alpha # initialize a lowest possible value (only changes when alphaBeta is True)
         
         for childNode in childNodes:
+            # if we are looking at root --> capture best board in next layer
+            if depth == 0: bestNextMove = childNode
             
             if alphaBeta:
                 
                 childVal = minMaxSearch(childNode, depth+1, 'min', maxDepth, True, currVal, beta) 
-                currVal = max(currVal, childVal)
-                #alpha = max(currVal, alpha)
                 
-                if depth == 0: # if rootnode, then we need to return next move node
-                
-                    depth1Vals.append(childVal) 
-                    depth1Nodes.append(childNode)       
-                   
-                if beta <= currVal: # if true, this cannot be the shortest path, so dont consider
+                if childVal > currVal:
+                    
+                    if depth == 0: # find the move with the highest value
+
+                        bestNextMove = childNode
+                    
+                    currVal = childVal
+                                       
+                if beta <= currVal: # if true, dont consider other childNodes
                     break 
             else: 
                 childVal = minMaxSearch(childNode, depth+1, 'min', maxDepth) 
-                currVal = max(currVal, childVal)
-            
-                if depth == 0: # if rootnode, then we need to return next move node
-                
-                    depth1Vals.append(childVal) 
-                    depth1Nodes.append(childNode)                  
-                        
+
+                if childVal > currVal:
+                    
+                    if depth == 0: # set find the move with the highest value
+
+                        bestNextMove = childNode
+                    
+                    currVal = childVal
+                                        
         if depth == 0: # return the node that corresponds to next move 
         
-            return depth1Nodes[depth1Vals.index(max(depth1Vals))]
+            return bestNextMove
     
         else:        
             return currVal
@@ -228,14 +255,8 @@ def minMaxSearch(currentNode, depth, kind, maxDepth, alphaBeta=False, alpha = -m
                 
                 childVal = minMaxSearch(childNode, depth+1, 'max', maxDepth, True, alpha, currVal) 
                 currVal = min(currVal, childVal)
-                #beta = min(beta, currVal)
-                
-                if depth == 0: # if rootnode, then we need to return next move node
-                
-                    depth1Vals.append(childVal) 
-                    depth1Nodes.append(childNode)    
-            
-                if currVal <= alpha:
+
+                if currVal <= alpha: # if true, dont consider other childNodes
                     break
             
             else:
@@ -247,7 +268,13 @@ def minMaxSearch(currentNode, depth, kind, maxDepth, alphaBeta=False, alpha = -m
 
 ###############################################################################
     
-def playGame(maxDepth, boardShape = [9,9], alphaBeta=False):
+def playGame(boardShape = [9,9], alphaBeta=False):
+    '''
+    plays the game, continuously asks user for move and then performs computer 
+    move through minimax search by calling minMaxSearch() function prints scores
+    after each play. Checks to see if board is full, if yes, game ends and final 
+    score and winner is printed.
+    '''
     
     charArr = np.chararray(boardShape)
     charArr[:] = '.'
@@ -259,6 +286,8 @@ def playGame(maxDepth, boardShape = [9,9], alphaBeta=False):
     print initBoard.printBoard()
 
     currBoard = initBoard # all dots
+    
+    maxDepth = int(input('Please pick the number of turns ahead the computer should look: '))
     
     while True:
         
@@ -302,25 +331,19 @@ def playGame(maxDepth, boardShape = [9,9], alphaBeta=False):
     if goalReached_ai: finalBoard = nextBoard_afterAI
     if goalReached_player: finalBoard = nextBoard_afterPlayer
     
-    playerScore, aiScore, finalScore = finalBoard.evaluate() # extract only max - min
+    aiScore, playerScore, finalScore = finalBoard.evaluate() 
     
     print 'Computer\'s Score: ', aiScore
     print 'Your Score: ', playerScore
             
-    if finalScore > 0:
+    if finalScore < 0:
         print 'You win! Congrats!'
         
-    if finalScore < 0:
+    if finalScore > 0:
         print 'Computer Wins!'
         
         
 ###############################################################################
-
- 
-# calc cost for each successor function
-# create successor function which lists out possible moves for opponent
-# add alpha beta pruning
-# goal test function -- tells if state is terminal
-playGame(7, boardShape = [9,9], alphaBeta=True)
+playGame(boardShape = [9,9], alphaBeta=True)
 
 
